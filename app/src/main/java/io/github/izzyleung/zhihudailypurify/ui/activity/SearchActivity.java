@@ -3,19 +3,20 @@ package io.github.izzyleung.zhihudailypurify.ui.activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.SearchView;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
-import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
+import java.util.List;
+
 import io.github.izzyleung.zhihudailypurify.R;
+import io.github.izzyleung.zhihudailypurify.bean.DailyNews;
 import io.github.izzyleung.zhihudailypurify.task.BaseSearchTask;
 import io.github.izzyleung.zhihudailypurify.ui.fragment.SearchNewsFragment;
+import io.github.izzyleung.zhihudailypurify.ui.widget.IzzySearchView;
 
-public class SearchActivity extends ActionBarActivity {
-    private SearchView searchView;
+public class SearchActivity extends BaseActivity {
+    private IzzySearchView searchView;
     private SearchNewsFragment searchNewsFragment;
 
     @Override
@@ -27,13 +28,12 @@ public class SearchActivity extends ActionBarActivity {
         searchNewsFragment = new SearchNewsFragment();
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(android.R.id.content, searchNewsFragment)
+                .add(R.id.fragment_frame, searchNewsFragment)
                 .commit();
     }
 
     @Override
     public void onDestroy() {
-        Crouton.cancelAllCroutons();
         searchNewsFragment = null;
 
         super.onDestroy();
@@ -51,45 +51,29 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     private void initView() {
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-
-        searchView = new SearchView(this);
-        searchView.setIconifiedByDefault(true);
-        searchView.setIconified(false);
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            public boolean onClose() {
-                return true;
-            }
-        });
+        searchView = new IzzySearchView(this);
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchView.setOnQueryTextListener(new IzzySearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                new SearchTask(getString(R.string.display_format)).execute(query);
+                new SearchTask().execute(query);
                 searchView.clearFocus();
                 return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
             }
         });
 
         RelativeLayout relative = new RelativeLayout(this);
         relative.addView(searchView);
-        getSupportActionBar().setCustomView(relative);
+
+        mToolBar.addView(relative);
+
+        setSupportActionBar(mToolBar);
+        //noinspection ConstantConditions
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     class SearchTask extends BaseSearchTask {
         private ProgressDialog dialog;
-
-        public SearchTask(String dateFormat) {
-            super(dateFormat);
-        }
 
         @Override
         protected void onPreExecute() {
@@ -106,7 +90,7 @@ public class SearchActivity extends ActionBarActivity {
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(List<DailyNews> newsList) {
             if (dialog != null) {
                 dialog.dismiss();
                 dialog = null;
@@ -114,11 +98,11 @@ public class SearchActivity extends ActionBarActivity {
 
             if (!isCancelled()) {
                 if (isSearchSuccess) {
-                    searchNewsFragment.updateContent(newsList, dateResultList);
+                    searchNewsFragment.updateContent(newsList);
                 } else {
-                    Crouton.makeText(SearchActivity.this,
+                    Toast.makeText(SearchActivity.this,
                             getString(R.string.no_result_found),
-                            Style.ALERT).show();
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         }

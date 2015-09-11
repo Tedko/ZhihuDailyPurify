@@ -85,7 +85,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
     <string name="no_browser"><![CDATA[No Browser Installed~ >_<]]></string>
     <string name="not_coming"><![CDATA[That day has not come yet! >_<]]></string>
     <string name="not_born"><![CDATA[Zhihu Daily not born that day! >_<]]></string>
-    <string name="open_using_client">Open Link Using Zhihu\'s Official Client</string>
     <string name="zhihu_daily_today">Zhihu Daily Today |</string>
     <string name="action_forward">The Day After</string>
     <string name="action_back">The Day Before</string>
@@ -98,9 +97,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
     <string name="search_hint">Search Zhihu Daily</string>
     <string name="no_result_found">No result found</string>
     <string name="searching">Searching for result…</string>
-    <string name="display_format">EEE, MMM d, yyyy</string>
-    <string name="accelerate_server_hint_dialog_title">Do you want to use the accelerate server?</string>
-    <string name="accelerate_server_hint_dialog_message">The server will save your data budget and bring you faster speed when browsing old days\' news.</string>
     <string name="action_share_url">Share</string>
     <string name="share_to">Share to…</string>
     <string name="accelerate_server_unlock">Accelerate server unlocked</string>

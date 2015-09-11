@@ -1,12 +1,13 @@
 package io.github.izzyleung.zhihudailypurify.task;
 
+import android.os.AsyncTask;
+
 import java.util.List;
 
 import io.github.izzyleung.zhihudailypurify.ZhihuDailyPurifyApplication;
 import io.github.izzyleung.zhihudailypurify.bean.DailyNews;
-import io.github.izzyleung.zhihudailypurify.support.lib.MyAsyncTask;
 
-public abstract class BaseGetNewsTask extends BaseHttpTask<Void, Void, List<DailyNews>> {
+public abstract class BaseGetNewsTask extends BaseDownloadTask<Void, Void, List<DailyNews>> {
     protected boolean isRefreshSuccess = true;
     protected boolean isContentSame = false;
     protected String date;
@@ -26,12 +27,17 @@ public abstract class BaseGetNewsTask extends BaseHttpTask<Void, Void, List<Dail
     @Override
     protected void onPostExecute(List<DailyNews> resultNewsList) {
         if (isRefreshSuccess && !isContentSame) {
-            new SaveNewsListTask(date, resultNewsList).executeOnExecutor(MyAsyncTask.THREAD_POOL_EXECUTOR);
+            for (DailyNews news : resultNewsList) {
+                news.setDate(date);
+            }
+
+            new SaveNewsListTask(date, resultNewsList).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
         if (mListener != null) {
             mListener.afterTaskFinished(resultNewsList, isRefreshSuccess, isContentSame);
         }
+
         mListener = null;
     }
 
@@ -39,9 +45,9 @@ public abstract class BaseGetNewsTask extends BaseHttpTask<Void, Void, List<Dail
         return externalNewsList.equals(ZhihuDailyPurifyApplication.getDataSource().newsOfTheDay(date));
     }
 
-    public static interface UpdateUIListener {
-        public void beforeTaskStart();
+    public interface UpdateUIListener {
+        void beforeTaskStart();
 
-        public void afterTaskFinished(List<DailyNews> resultList, boolean isRefreshSuccess, boolean isContentSame);
+        void afterTaskFinished(List<DailyNews> resultList, boolean isRefreshSuccess, boolean isContentSame);
     }
 }

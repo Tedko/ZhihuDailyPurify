@@ -2,22 +2,20 @@ package io.github.izzyleung.zhihudailypurify.ui.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 import io.github.izzyleung.zhihudailypurify.R;
 import io.github.izzyleung.zhihudailypurify.support.Constants;
 import io.github.izzyleung.zhihudailypurify.ui.fragment.NewsListFragment;
 import io.github.izzyleung.zhihudailypurify.ui.fragment.PickDateFragment;
 
-public class PortalActivity extends ActionBarActivity
+public class PortalActivity extends BaseActivity
         implements PickDateFragment.PickDateListener {
     private static final int ACTION_PREVIOUS_DAY = 0, ACTION_NEXT_DAY = 1;
 
@@ -29,16 +27,11 @@ public class PortalActivity extends ActionBarActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         showPickDateFragment();
-    }
-
-    @Override
-    protected void onDestroy() {
-        Crouton.cancelAllCroutons();
-
-        super.onDestroy();
     }
 
     @Override
@@ -50,7 +43,7 @@ public class PortalActivity extends ActionBarActivity
                 getSupportFragmentManager().popBackStack();
             }
 
-            getSupportActionBar().setTitle(R.string.action_pick_date);
+            mToolBar.setTitle(R.string.action_pick_date);
             prev.setVisible(false);
             next.setVisible(false);
         }
@@ -76,7 +69,7 @@ public class PortalActivity extends ActionBarActivity
                 return true;
             case R.id.forward:
                 if (isSameDay(Calendar.getInstance(), calendar)) {
-                    showCrouton(R.string.this_is_today, Style.INFO);
+                    showToast(R.string.this_is_today);
                     return true;
                 }
                 updateFields(ACTION_NEXT_DAY);
@@ -84,7 +77,7 @@ public class PortalActivity extends ActionBarActivity
                 return true;
             case R.id.back:
                 if (isSameDay(Constants.Date.birthday, calendar.getTime())) {
-                    showCrouton(R.string.this_is_birthday, Style.INFO);
+                    showToast(R.string.this_is_birthday);
                     return true;
                 }
                 updateFields(ACTION_PREVIOUS_DAY);
@@ -104,10 +97,10 @@ public class PortalActivity extends ActionBarActivity
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(android.R.id.content, displayFragment)
+                .replace(R.id.fragment_frame, displayFragment)
                 .commit();
 
-        getSupportActionBar().setTitle(R.string.action_pick_date);
+        mToolBar.setTitle(R.string.action_pick_date);
     }
 
     private void updateFields(int action) {
@@ -138,14 +131,13 @@ public class PortalActivity extends ActionBarActivity
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(android.R.id.content, displayFragment)
+                .replace(R.id.fragment_frame, displayFragment)
                 .addToBackStack(null)
                 .commit();
 
-        String displayDate = new SimpleDateFormat(getString(R.string.display_format)).
-                format(calendar.getTime());
+        String displayDate = DateFormat.getDateInstance().format(calendar.getTime());
 
-        getSupportActionBar().setTitle(displayDate);
+        mToolBar.setTitle(displayDate);
     }
 
     private boolean isSameDay(Calendar first, Calendar second) {
@@ -168,17 +160,15 @@ public class PortalActivity extends ActionBarActivity
         prev.setVisible(true);
         next.setVisible(true);
 
-        Crouton.cancelAllCroutons();
-
         updateView();
     }
 
     @Override
     public void onInvalidDateSelected(Date date) {
         if (date.after(new Date())) {
-            showCrouton(R.string.not_coming, Style.ALERT);
+            showToast(R.string.not_coming);
         } else {
-            showCrouton(R.string.not_born, Style.ALERT);
+            showToast(R.string.not_born);
         }
     }
 
@@ -187,7 +177,7 @@ public class PortalActivity extends ActionBarActivity
         return calendar.getTime();
     }
 
-    private void showCrouton(int resId, Style style) {
-        Crouton.makeText(PortalActivity.this, getString(resId), style).show();
+    private void showToast(int resId) {
+        Toast.makeText(PortalActivity.this, getString(resId), Toast.LENGTH_SHORT).show();
     }
 }

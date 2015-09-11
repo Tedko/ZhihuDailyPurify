@@ -6,30 +6,26 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.astuetz.PagerSlidingTabStrip;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Calendar;
 
 import io.github.izzyleung.zhihudailypurify.R;
 import io.github.izzyleung.zhihudailypurify.support.Constants;
 import io.github.izzyleung.zhihudailypurify.ui.fragment.NewsListFragment;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends BaseActivity {
     private static final int PAGE_COUNT = 7;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        layoutResID = R.layout.activity_main;
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        super.onCreate(savedInstanceState);
 
         PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.main_pager_tabs);
         ViewPager viewPager = (ViewPager) findViewById(R.id.main_pager);
@@ -97,7 +93,7 @@ public class MainActivity extends ActionBarActivity {
             displayDate.add(Calendar.DAY_OF_YEAR, -position);
 
             return (position == 0 ? getString(R.string.zhihu_daily_today) + " " : "")
-                    + new SimpleDateFormat(getString(R.string.display_format)).format(displayDate.getTime());
+                    + DateFormat.getDateInstance().format(displayDate.getTime());
         }
     }
 }

@@ -1,5 +1,7 @@
 package io.github.izzyleung.zhihudailypurify.task;
 
+import android.text.TextUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,7 +16,6 @@ import java.util.List;
 
 import io.github.izzyleung.zhihudailypurify.bean.DailyNews;
 import io.github.izzyleung.zhihudailypurify.support.Constants;
-import io.github.izzyleung.zhihudailypurify.support.Logger;
 import io.github.izzyleung.zhihudailypurify.support.lib.Http;
 
 public class OriginalGetNewsTask extends BaseGetNewsTask {
@@ -52,7 +53,6 @@ public class OriginalGetNewsTask extends BaseGetNewsTask {
             }
         } catch (JSONException | IOException e) {
             isRefreshSuccess = false;
-            Logger.e(e);
         }
 
         isContentSame = checkIsContentSame(resultNewsList);
@@ -114,7 +114,13 @@ public class OriginalGetNewsTask extends BaseGetNewsTask {
             dailyNews.setQuestionTitle(dailyNews.getDailyTitle());
         } else {
             if (doc.getElementsByClass("question-title").size() == 1) {
-                dailyNews.setQuestionTitle(doc.getElementsByClass("question-title").text());
+                String questionTitle = doc.getElementsByClass("question-title").text();
+
+                if (TextUtils.isEmpty(questionTitle)) {
+                    dailyNews.setQuestionTitle(dailyNews.getDailyTitle());
+                } else {
+                    dailyNews.setQuestionTitle(questionTitle);
+                }
             } else {
                 for (Element questionTitle : doc.getElementsByClass("question-title")) {
                     if (!(questionTitle.text().equals("原题描述：") || questionTitle.text().equals("原题描述"))) {
